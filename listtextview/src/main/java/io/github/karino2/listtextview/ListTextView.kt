@@ -9,6 +9,8 @@ import android.util.AttributeSet
 import android.util.SparseBooleanArray
 import android.view.*
 import android.widget.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ListTextView(val cont: Context, attrs: AttributeSet) : RelativeLayout(cont, attrs) {
 
@@ -21,6 +23,8 @@ class ListTextView(val cont: Context, attrs: AttributeSet) : RelativeLayout(cont
     var listView : ListView
 
     var onDatasetChangedListener : ()-> Unit = {}
+
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm")
 
     init {
         inflate(context, R.layout.list_text_view, this)
@@ -35,7 +39,8 @@ class ListTextView(val cont: Context, attrs: AttributeSet) : RelativeLayout(cont
         }
 
         findViewById<Button>(R.id.buttonNew).setOnClickListener {
-            startEditCellActivityForResult(-1, "")
+            val nowstr = sdf.format(Date().time)
+            startEditCellActivityForResult(-1, "$nowstr\n")
         }
 
         listView.setOnKeyListener(object: View.OnKeyListener {
