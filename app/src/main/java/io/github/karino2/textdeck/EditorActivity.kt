@@ -48,18 +48,27 @@ class EditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_editor)
+
 
         intent?.let {
             if (it.action == Intent.ACTION_VIEW)
             {
-                Log.d("TextDeck", "deb")
                 it.data?.let { uri ->
                     writeLastUriStr(this, uri.toString())
-                    openUri(uri)
                 }
             }
         }
+
+        val urlstr = lastUriStr(this)
+
+        if(urlstr == null)
+        {
+            Toast.makeText(this, "Use via ACTION_VIEW for the first time.", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+
+        setContentView(R.layout.activity_editor)
+        openUri(lastUri)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
