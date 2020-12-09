@@ -41,6 +41,9 @@ class EditCellActivity : AppCompatActivity() {
                 false
             }
         }
+        val lastpos = editText.text.toString().length
+        editText.setSelection(lastpos)
+        editText.requestFocus()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
