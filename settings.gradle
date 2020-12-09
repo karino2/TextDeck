@@ -1,0 +1,3 @@
+include ':listtextview'
+include ':app'
+rootProject.name = "TextDeck"
