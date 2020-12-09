@@ -63,8 +63,10 @@ class EditorActivity : AppCompatActivity() {
 
         if(urlstr == null)
         {
-            Toast.makeText(this, "Use via ACTION_VIEW for the first time.", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, SetupActivity::class.java)
+            startActivity(intent)
             finish()
+            return
         }
 
         setContentView(R.layout.activity_editor)

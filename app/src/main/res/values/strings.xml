@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TextDeck</string>
+    <string name="html_name">setup.html</string>
 </resources>
