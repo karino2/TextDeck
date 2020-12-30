@@ -26,6 +26,7 @@ class EditCellActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_cell)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         intent?.let {
             cellId = it.getIntExtra("CELL_ID", -1)
@@ -53,6 +54,10 @@ class EditCellActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
+            android.R.id.home-> {
+                finish()
+                return true
+            }
             R.id.save_item -> {
                 finishAsCommitCell()
             }
