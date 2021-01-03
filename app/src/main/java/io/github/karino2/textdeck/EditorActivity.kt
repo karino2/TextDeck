@@ -20,7 +20,7 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
         const val REQUEST_EDIT_CELL_CODE=1
         const val  LAST_URI_KEY = "last_uri_path"
         const val  LAST_READ_TIME_KEY = "last_read_time"
-        const val SHORT_ENOUGH = 1*60*1000
+        const val SHORT_ENOUGH = 1*10*1000
 
         fun lastUriStr(ctx: Context) = sharedPreferences(ctx).getString(LAST_URI_KEY, null)
         fun writeLastUriStr(ctx: Context, path : String) = sharedPreferences(ctx).edit()
