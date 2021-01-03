@@ -58,9 +58,10 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
 
         writeLastReadTime(this, now)
         launch(Dispatchers.IO) {
-            val desc = contentResolver.openFileDescriptor(lastUri, "r")!!
-            val fis = FileInputStream(desc.fileDescriptor)
-            val text = fis.bufferedReader().use { it.readText() }
+            val text = contentResolver.openFileDescriptor(lastUri, "r")!!.use {desc->
+                val fis = FileInputStream(desc.fileDescriptor)
+                fis.bufferedReader().use { it.readText() }
+            }
             if (text == lastReadContent)
                 return@launch
 
@@ -93,10 +94,11 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
     var lastReadContent : String = ""
 
     fun saveFile() {
-        val desc = contentResolver.openFileDescriptor(lastUri, "w")!!
-        val fos = FileOutputStream(desc.fileDescriptor)
-        fos.use {
-            it.write(listTextView.text.toByteArray())
+        contentResolver.openFileDescriptor(lastUri, "w")!!.use {desc->
+            val fos = FileOutputStream(desc.fileDescriptor)
+            fos.use {
+                it.write(listTextView.text.toByteArray())
+            }
         }
     }
 
@@ -138,9 +140,10 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
 
     fun openUri(uri: Uri) {
         writeLastReadTime(this, (Date()).time)
-        val desc = contentResolver.openFileDescriptor(uri, "r")!!
-        val fis = FileInputStream(desc.fileDescriptor)
-        val text = fis.bufferedReader().use { it.readText() }
+        val text = contentResolver.openFileDescriptor(uri, "r")!!.use {desc->
+            val fis = FileInputStream(desc.fileDescriptor)
+            fis.bufferedReader().use { it.readText() }
+        }
         listTextView.text = text
         lastReadContent = text
     }
