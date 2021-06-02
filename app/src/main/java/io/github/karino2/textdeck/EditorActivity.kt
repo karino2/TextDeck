@@ -10,6 +10,7 @@ import io.github.karino2.listtextview.ListTextView
 import kotlinx.coroutines.*
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -119,14 +120,24 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
 
         if(urlstr == null)
         {
-            val intent = Intent(this, SetupActivity::class.java)
-            startActivity(intent)
+            gotoSetup()
             finish()
             return
         }
 
         setContentView(R.layout.activity_editor)
-        openUri(lastUri)
+        try {
+            openUri(lastUri)
+        } catch( e: FileNotFoundException) {
+            gotoSetup()
+            finish()
+        }
+
+    }
+
+    private fun gotoSetup() {
+        val intent = Intent(this, SetupActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
