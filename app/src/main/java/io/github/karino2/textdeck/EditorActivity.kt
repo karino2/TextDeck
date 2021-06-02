@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import io.github.karino2.listtextview.ListTextView
 import kotlinx.coroutines.*
@@ -45,10 +47,10 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
     override fun onStart() {
         job = Job()
         super.onStart()
-        checkUpdate()
+        checkUpdateIfNecessary()
     }
 
-    private fun checkUpdate() {
+    private fun checkUpdateIfNecessary() {
         val now = (Date()).time
         val last = lastReadTime(this)
 
@@ -58,8 +60,12 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
         lastUriStr(this) ?: return
 
         writeLastReadTime(this, now)
+        checkUpdate()
+    }
+
+    private fun checkUpdate() {
         launch(Dispatchers.IO) {
-            val text = contentResolver.openFileDescriptor(lastUri, "r")!!.use {desc->
+            val text = contentResolver.openFileDescriptor(lastUri, "r")!!.use { desc ->
                 val fis = FileInputStream(desc.fileDescriptor)
                 fis.bufferedReader().use { it.readText() }
             }
@@ -138,6 +144,23 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
     private fun gotoSetup() {
         val intent = Intent(this, SetupActivity::class.java)
         startActivity(intent)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_editor, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId)
+        {
+            R.id.menu_item_refresh-> {
+                showMessage(this, "check update")
+                checkUpdate()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
