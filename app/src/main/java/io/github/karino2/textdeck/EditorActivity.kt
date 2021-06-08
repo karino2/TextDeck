@@ -21,18 +21,12 @@ import kotlin.coroutines.CoroutineContext
 class EditorActivity : AppCompatActivity(), CoroutineScope {
     companion object {
         const val REQUEST_EDIT_CELL_CODE=1
+        const val REQUEST_SETTING_CODE=2
         const val  LAST_URI_KEY = "last_uri_path"
-        const val  LAST_READ_TIME_KEY = "last_read_time"
-        const val SHORT_ENOUGH = 1*10*1000
 
         fun lastUriStr(ctx: Context) = sharedPreferences(ctx).getString(LAST_URI_KEY, null)
         fun writeLastUriStr(ctx: Context, path : String) = sharedPreferences(ctx).edit()
             .putString(LAST_URI_KEY, path)
-            .commit()
-
-        fun lastReadTime(ctx: Context) = sharedPreferences(ctx).getLong(LAST_READ_TIME_KEY, 0)
-        fun writeLastReadTime(ctx: Context, time : Long) = sharedPreferences(ctx).edit()
-            .putLong(LAST_READ_TIME_KEY, time)
             .commit()
 
         private fun sharedPreferences(ctx: Context) = ctx.getSharedPreferences("TEXT_DECK_PREFS", Context.MODE_PRIVATE)
@@ -47,20 +41,6 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
     override fun onStart() {
         job = Job()
         super.onStart()
-        checkUpdateIfNecessary()
-    }
-
-    private fun checkUpdateIfNecessary() {
-        val now = (Date()).time
-        val last = lastReadTime(this)
-
-        if (last != 0L && (now-last) < SHORT_ENOUGH )
-            return
-
-        lastUriStr(this) ?: return
-
-        writeLastReadTime(this, now)
-        checkUpdate()
     }
 
     private fun checkUpdate() {
@@ -111,7 +91,7 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setContentView(R.layout.activity_editor)
 
         intent?.let {
             if (it.action == Intent.ACTION_VIEW)
@@ -126,24 +106,21 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
 
         if(urlstr == null)
         {
-            gotoSetup()
-            finish()
+            gotoSettings()
             return
         }
 
-        setContentView(R.layout.activity_editor)
         try {
             openUri(lastUri)
         } catch( e: FileNotFoundException) {
-            gotoSetup()
-            finish()
+            gotoSettings()
         }
 
     }
 
-    private fun gotoSetup() {
+    private fun gotoSettings() {
         val intent = Intent(this, SetupActivity::class.java)
-        startActivity(intent)
+        startActivityForResult(intent, REQUEST_SETTING_CODE)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -159,21 +136,35 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
                 checkUpdate()
                 return true
             }
+            R.id.menu_item_preferences -> {
+                gotoSettings()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        data?.let {
-            if(listTextView.handleOnActivityResult(requestCode, resultCode, it)) {
-                return
+        when(requestCode) {
+            REQUEST_EDIT_CELL_CODE -> {
+                data?.let {
+                    if(listTextView.handleOnActivityResult(requestCode, resultCode, it)) {
+                        return
+                    }
+                }
+            }
+            REQUEST_SETTING_CODE -> {
+                if (resultCode == RESULT_OK)
+                {
+                    openUri(lastUri)
+                    return
+                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     fun openUri(uri: Uri) {
-        writeLastReadTime(this, (Date()).time)
         val text = contentResolver.openFileDescriptor(uri, "r")!!.use {desc->
             val fis = FileInputStream(desc.fileDescriptor)
             fis.bufferedReader().use { it.readText() }
