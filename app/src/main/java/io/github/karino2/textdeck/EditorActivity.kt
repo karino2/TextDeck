@@ -114,6 +114,9 @@ class EditorActivity : AppCompatActivity(), CoroutineScope {
             openUri(lastUri)
         } catch( e: FileNotFoundException) {
             gotoSettings()
+        } catch( _:  SecurityException) {
+            showMessage(this, "Can't open file...")
+            gotoSettings()
         }
 
     }
