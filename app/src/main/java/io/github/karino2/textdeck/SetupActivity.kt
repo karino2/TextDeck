@@ -3,10 +3,9 @@ package io.github.karino2.textdeck
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.webkit.WebView
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -77,7 +76,7 @@ class SetupActivity : AppCompatActivity() {
         when(requestCode) {
             REQUEST_NEW_FILE -> {
                 data?.data?.also {
-                    contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    contentResolver.takePersistableUriPermission(it,   Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     createEmptyContent(it)
                     writeLastUri(it)
                     setResult(RESULT_OK)
